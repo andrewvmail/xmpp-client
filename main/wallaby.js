@@ -14,8 +14,8 @@ module.exports = function (wallaby) {
     },
     compilers: {
       '**/*.js': wallaby.compilers.babel({
-        // Tell Wallaby to use Ava's Babel preset, necessary if your project doesn't use Babel otherwise.
-        presets: ['@ava/babel-preset-stage-4']
+        babelrc: true,
+        presets: ['@ava/babel-preset-stage-4', ]
       })
     },
     testFramework: 'ava',

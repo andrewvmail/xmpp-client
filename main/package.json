@@ -10,5 +10,10 @@
   "license": "MIT",
   "devDependencies": {
     "ava": "1.0.0-beta.8"
+  },
+  "dependencies": {
+    "babel-plugin-cerebral": "^1.0.0",
+    "cerebral": "^5.0.0",
+    "stanza.io": "^9.1.0"
   }
 }
