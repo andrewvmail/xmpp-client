@@ -13,7 +13,7 @@ const app = App({
   }
 });
 
-test("should connect client connect", t => {
+test("should connect when xmpp.connect()", t => {
   let connected;
   t.is(connected, undefined);
   app.runSequence("connect", [
