@@ -1,13 +1,24 @@
-import XMPP from 'stanza.io'
-import { state, moduleState } from 'cerebral'
-import { set } from "cerebral/factories";
+import XMPP from "stanza.io";
 
-const Xmpp = ({onConnected}) => (context) => {
+const Xmpp = ({ onConnected, onSessionBound, config }) => context => {
+  let client;
   return {
-    connect() {
-      context.app.runSequence('onConnected', onConnected)
-    }
-  }
-}
+    connect({ username, password }) {
+      client = XMPP.createClient({
+        jid: username + "@" + config.domain,
+        password,
+        transport: "websocket",
+        wsURL: "ws://localhost:5280/ws-xmpp"
+      });
 
-export default Xmpp
+      client.on("session:bound", () => {
+        console.log("xmpp: session:bound");
+        context.app.runSequence("xmppSessionBound", onSessionBound);
+      });
+
+      client.connect();
+    }
+  };
+};
+
+export default Xmpp;
