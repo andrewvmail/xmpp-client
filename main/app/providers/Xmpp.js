@@ -1,6 +1,6 @@
 import XMPP from "stanza.io";
 
-const Xmpp = ({ onConnected, onSessionBound, onPresence, config }) => {
+const Xmpp = ({ onConnected, onSessionBound, onPresence, onChat, config }) => {
   let client;
 
   return context => {
@@ -26,8 +26,21 @@ const Xmpp = ({ onConnected, onSessionBound, onPresence, config }) => {
           if (payload.from.local === payload.to.local) {
             // we want to bootstrap here later
             // context.app.runSequence("messagingBootstrap", [])
-            return;
           }
+        });
+        client.on("chat", message => {
+          if(!message.id || !message.from.local || !message.from.local || !message.to.local) {
+            // all message should have these things
+            return
+          }
+          context.app.runSequence("onChat", onChat, {
+            message: {
+              id: message.id,
+              from: message.from.local,
+              to: message.from.to,
+              body: message.body
+            }
+          });
         });
       },
       connect() {
@@ -35,6 +48,9 @@ const Xmpp = ({ onConnected, onSessionBound, onPresence, config }) => {
       },
       sendPresence({ nick }) {
         client.sendPresence({ nick });
+      },
+      sendMessage(message) {
+        client.sendMessage(message);
       }
     };
   };

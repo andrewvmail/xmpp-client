@@ -16,8 +16,6 @@ const config = {
   }
 };
 
-
-
 test.cb("testing xmpp provider", t => {
   const app = App({
     state: {
@@ -27,14 +25,15 @@ test.cb("testing xmpp provider", t => {
       xmpp: Xmpp({
         config: { domain: "localhost" },
         onSessionBound: [set(state.connected, true)],
-        onPresence: [set(state.nick, props.nick)]
+        onPresence: [set(state.nick, props.nick)],
+        onChat: [set(state.messageToSelf, props.message.body)],
       })
     }
   });
 
   setTimeout(t.end, 2000); // https://github.com/wallabyjs/public/issues/1773
 
-  t.plan(2);
+  t.plan(3);
 
   app.runSequence("connect", [
     function connect({ xmpp, get, state }) {
@@ -56,6 +55,17 @@ test.cb("testing xmpp provider", t => {
     wait(100),
     function assert({ state }) {
       t.is(state.get("nick"), "momo", "nick should be momo after sent presence with nick momo");
+    },
+    wait(50),
+    function sendMessageToSelf({xmpp}) {
+      xmpp.sendMessage({
+        to: config.user1.username + '@localhost',
+        body: "hi momo"
+      })
+    },
+    wait(100),
+    function assert({ state }) {
+      t.is(state.get("messageToSelf"), "hi momo", "should get message from self when send to self");
       t.end();
     },
   ]);
